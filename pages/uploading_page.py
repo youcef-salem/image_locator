@@ -13,10 +13,10 @@ class UploadingPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.config(bg=theme.background)
-        
-        self.uploaded_image_path = None
-        self.photo_reference = None
-        
+
+        self.uploaded_image_paths: list[str] = []
+        self.photo_references: list[ImageTk.PhotoImage] = []
+
         # Title label
         title_label = tk.Label(self, text="Upload Image", 
                                bg=theme.background, fg=theme.text,
@@ -52,15 +52,19 @@ class UploadingPage(tk.Frame):
         )
         
         if file_path:
-            self.uploaded_image_path = file_path
+            self.uploaded_image_paths.append(file_path)
             filename = os.path.basename(file_path)
-            self.info_label.config(text=f"Selected: {filename}")
+            self.info_label.config(text=f"Selected : {filename} ")
             
             # Show preview
             try:
                 preview_image = Image.open(file_path)
                 preview_image.thumbnail((400, 300))
-                self.photo_reference = ImageTk.PhotoImage(preview_image)
-                self.preview_label.config(image=self.photo_reference)
+                photo_reference = ImageTk.PhotoImage(preview_image)
+                  
+                self.photo_references.append(photo_reference)
+                self.preview_label.config(image=photo_reference)
+                print(f"Number of images: {len(self.photo_references)}")
+                print(f"Number of images: {len(self.uploaded_image_paths)}")
             except Exception as e:
                 messagebox.showerror("Error", f"Could not load image: {e}")
