@@ -1,13 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import sys
-import os
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from utils.theme import Theme
 from PIL import Image, ImageTk
+import os
+from utils import Theme
 
 theme = Theme()
 styles = theme.tk_styles()

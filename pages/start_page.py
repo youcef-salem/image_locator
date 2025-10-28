@@ -1,18 +1,12 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import sys
-import os
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from utils.theme import Theme
+from utils import Theme
 
 theme = Theme()
 styles = theme.tk_styles()
 
 
-class MainPage(tk.Frame):
+class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller

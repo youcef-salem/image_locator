@@ -1,6 +1,5 @@
 import tkinter as tk
-from pages.main_page import MainPage
-from pages.uploading_page import UploadingPage
+from pages import StartPage, UploadingPage
 
 main_dimension = "700x500"
 
@@ -24,7 +23,7 @@ class AppController(tk.Tk):
     def create_frames(self, container):
         """Create all page frames"""
         frames_config = {
-            "main": MainPage,
+            "main": StartPage,
             "uploading": UploadingPage,
         }
         

@@ -33,8 +33,8 @@ def _hex_to_rgba(hex_color: str, alpha: float = 1.0) -> Tuple[int, int, int, flo
 @dataclass
 class Theme:
     # Core colors
-    primary: str = "#1976D2"         # blue
-    primary_dark: str = "#115293"
+    primary: str = "#55B158"         # green
+    primary_dark: str = "#388E3C"
     accent: str = "#FF6F00"          # amber/orange
     background: str = "#F5F7FA"      # light gray
     surface: str = "#FFFFFF"         # card background
