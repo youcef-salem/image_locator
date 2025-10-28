@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from PIL import Image, ImageTk
 import os
 from utils import Theme
+from utils.upload_image import ImageUploadManager, add_image_to_list, delete_image_from_list
 
 theme = Theme()
 styles = theme.tk_styles()
@@ -14,8 +14,8 @@ class UploadingPage(tk.Frame):
         self.controller = controller
         self.config(bg=theme.background)
 
-        self.uploaded_image_paths: list[str] = []
-        self.photo_references: list[ImageTk.PhotoImage] = []
+        # Initialize image manager
+        self.image_manager = ImageUploadManager(thumbnail_size=(150, 150))
 
         # Title label
         title_label = tk.Label(self, text="Upload Image", 
@@ -29,14 +29,25 @@ class UploadingPage(tk.Frame):
         upload_button.config(**styles["primary_button"])
         upload_button.pack(pady=10)
         
-        # Display image info
-        self.info_label = tk.Label(self, text="No image selected",
-                                   bg=theme.background, fg=theme.muted)
-        self.info_label.pack(pady=10)
+        # Images list container (scrollable)
+        list_frame = tk.Frame(self, bg=theme.background)
+        list_frame.pack(pady=10, padx=20, fill="both", expand=True)
         
-        # Image preview
-        self.preview_label = tk.Label(self, bg=theme.surface)
-        self.preview_label.pack(pady=10, padx=20, fill="both", expand=True)
+        # Create canvas and scrollbar for scrollable list
+        self.canvas = tk.Canvas(list_frame, bg=theme.background, highlightthickness=0)
+        scrollbar = tk.Scrollbar(list_frame, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = tk.Frame(self.canvas, bg=theme.background)
+        
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+        
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
         
         # Back button
         back_button = tk.Button(self, text="Back to Home",
@@ -52,19 +63,22 @@ class UploadingPage(tk.Frame):
         )
         
         if file_path:
-            self.uploaded_image_paths.append(file_path)
-            filename = os.path.basename(file_path)
-            self.info_label.config(text=f"Selected : {filename} ")
-            
-            # Show preview
             try:
-                preview_image = Image.open(file_path)
-                preview_image.thumbnail((400, 300))
-                photo_reference = ImageTk.PhotoImage(preview_image)
-                  
-                self.photo_references.append(photo_reference)
-                self.preview_label.config(image=photo_reference)
-                print(f"Number of images: {len(self.photo_references)}")
-                print(f"Number of images: {len(self.uploaded_image_paths)}")
+                # Add image using manager
+                photo_reference = self.image_manager.add_image(file_path)
+                
+                # Add to display list using imported function
+                add_image_to_list(
+                    self.scrollable_frame, 
+                    file_path, 
+                    photo_reference,
+                    self.handle_delete,
+                    theme
+                )
+                print(f"Total images: {self.image_manager.get_image_count()}")
             except Exception as e:
                 messagebox.showerror("Error", f"Could not load image: {e}")
+    
+    def handle_delete(self, file_path: str, item_frame: tk.Frame):
+        """Handle delete button click"""
+        delete_image_from_list(self.image_manager, file_path, item_frame)
